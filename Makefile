@@ -1,31 +1,40 @@
-UNAME_M = $(shell uname -m)
-ARCH=
-ifeq ($(UNAME_M), x86_64)
-	ARCH=amd64
-else
-	ARCH=$(UNAME_M)
-endif
-
 SEVERITIES = HIGH,CRITICAL
 
-ifeq ($(TAG),)
-TAG = dev
+ifeq ($(ARCH),)
+ARCH=$(shell go env GOARCH)
 endif
 
-.PHONY: all
-all:
-	docker build --build-arg TAG=$(TAG) -t rancher/hardened-crictl:$(TAG) .
+ORG ?= rancher
+PKG ?= github.com/kubernetes-sigs/cri-tools
+SRC ?= github.com/kubernetes-sigs/cri-tools
+TAG ?= v1.18.0
+
+ifneq ($(DRONE_TAG),)
+TAG := $(DRONE_TAG)
+endif
+
+.PHONY: image-build
+image-build:
+	docker build \
+		--build-arg PKG=$(PKG) \
+		--build-arg SRC=$(SRC) \
+		--build-arg TAG=$(TAG) \
+		--tag $(ORG)/hardened-crictl:$(TAG) \
+		--tag $(ORG)/hardened-crictl:$(TAG)-$(ARCH) \
+	.
 
 .PHONY: image-push
 image-push:
-	docker push rancher/hardened-crictl:$(TAG) >> /dev/null
-
-.PHONY: scan
-image-scan:
-	trivy --severity $(SEVERITIES) --no-progress --skip-update --ignore-unfixed rancher/hardened-crictl:$(TAG)
+	docker push $(ORG)/hardened-crictl:$(TAG)-$(ARCH)
 
 .PHONY: image-manifest
 image-manifest:
-	docker image inspect rancher/hardened-crictl:$(TAG)
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create rancher/hardened-crictl:$(TAG) \
-		$(shell docker image inspect rancher/hardened-crictl:$(TAG) | jq -r '.[] | .RepoDigests[0]')
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create --amend \
+		$(ORG)/hardened-crictl:$(TAG) \
+		$(ORG)/hardened-crictl:$(TAG)-$(ARCH)
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push \
+		$(ORG)/hardened-crictl:$(TAG)
+
+.PHONY: image-scan
+image-scan:
+	trivy --severity $(SEVERITIES) --no-progress --ignore-unfixed $(ORG)/hardened-crictl:$(TAG)
