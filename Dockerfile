@@ -1,10 +1,10 @@
-ARG UBI_IMAGE=registry.access.redhat.com/ubi7/ubi-minimal:latest
+ARG BCI_IMAGE=registry.suse.com/bci/bci-base:latest
 ARG GO_IMAGE=rancher/hardened-build-base:UNSET_GO_IMAGE_ARG
-FROM ${UBI_IMAGE} as ubi
+FROM ${BCI_IMAGE} as bci
 FROM ${GO_IMAGE} as builder
 # setup required packages
-RUN set -x \
- && apk --no-cache add \
+RUN set -x && \
+    apk --no-cache add \
     file \
     gcc \
     git \
@@ -29,7 +29,7 @@ RUN if [ "${ARCH}" != "s390x" ]; then \
 RUN install -s bin/* /usr/local/bin
 RUN crictl --version
 
-FROM ubi
-RUN microdnf update -y && \
-    rm -rf /var/cache/yum
+FROM bci
+RUN zypper update -y && \
+    zypper clean --all
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
