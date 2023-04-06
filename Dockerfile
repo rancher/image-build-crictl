@@ -1,5 +1,5 @@
-ARG BCI_IMAGE=registry.suse.com/bci/bci-base:latest
-ARG GO_IMAGE=rancher/hardened-build-base:UNSET_GO_IMAGE_ARG
+ARG BCI_IMAGE=registry.suse.com/bci/bci-base:15.3.17.20.12
+ARG GO_IMAGE=rancher/hardened-build-base:1.20.3b1
 FROM ${BCI_IMAGE} as bci
 FROM ${GO_IMAGE} as builder
 # setup required packages
@@ -14,7 +14,7 @@ RUN set -x \
 # setup the build
 ARG PKG="github.com/kubernetes-sigs/cri-tools"
 ARG SRC="github.com/kubernetes-sigs/cri-tools"
-ARG TAG="v1.18.0"
+ARG TAG="v1.26.1"
 ARG ARCH="amd64"
 RUN git clone --depth=1 https://${SRC}.git $GOPATH/src/${PKG}
 WORKDIR $GOPATH/src/${PKG}
