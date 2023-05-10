@@ -23,7 +23,7 @@ RUN git checkout tags/${TAG} -b ${TAG}
 ENV GO_LDFLAGS="-linkmode=external -X ${PKG}/pkg/version.Version=${TAG}"
 RUN go-build-static.sh -gcflags=-trimpath=${GOPATH}/src -o bin/crictl ./cmd/crictl
 RUN go-assert-static.sh bin/*
-RUN if [ "${ARCH}" != "s390x" || "${ARCH}" != "arm64" ]; then \
+RUN if [ "${ARCH}" = "amd64" ]; then \
         go-assert-boring.sh bin/* ; \
     fi
 RUN install -s bin/* /usr/local/bin
