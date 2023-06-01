@@ -16,6 +16,12 @@ steps:
   volumes:
   - name: docker
     path: /var/run/docker.sock
+  when:
+    ref:
+      include:
+      - refs/heads/master
+      - refs/pull/**
+      - refs/tags/*
 
 - name: publish
   image: rancher/hardened-build-base:v1.20.4b11
@@ -41,6 +47,12 @@ steps:
   volumes:
   - name: docker
     path: /var/run/docker.sock
+  when:
+    ref:
+      include:
+      - refs/heads/master
+      - refs/pull/**
+      - refs/tags/*
 
 volumes:
 - name: docker
@@ -64,6 +76,12 @@ steps:
   volumes:
   - name: docker
     path: /var/run/docker.sock
+  when:
+    ref:
+      include:
+      - refs/heads/master
+      - refs/pull/**
+      - refs/tags/*
 
 - name: publish
   image: rancher/hardened-build-base:v1.20.4b11
@@ -89,6 +107,12 @@ steps:
   volumes:
   - name: docker
     path: /var/run/docker.sock
+  when:
+    ref:
+      include:
+      - refs/heads/master
+      - refs/pull/**
+      - refs/tags/*
 
 volumes:
 - name: docker
@@ -115,6 +139,12 @@ steps:
   volumes:
   - name: docker
     path: /var/run/docker.sock
+  when:
+    ref:
+      include:
+      - refs/heads/master
+      - refs/pull/**
+      - refs/tags/*
 
 - name: publish
   image: rancher/hardened-build-base:v1.20.4b11
