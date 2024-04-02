@@ -1,6 +1,4 @@
-ARG BCI_IMAGE=registry.suse.com/bci/bci-micro
 ARG GO_IMAGE=rancher/hardened-build-base:1.20.4b11
-FROM ${BCI_IMAGE} as bci
 FROM ${GO_IMAGE} as builder
 # setup required packages
 RUN set -x && \
@@ -29,5 +27,5 @@ RUN if [ "${ARCH}" = "amd64" ]; then \
 RUN install -s bin/* /usr/local/bin
 RUN crictl --version
 
-FROM bci
+FROM scratch
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
