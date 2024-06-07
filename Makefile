@@ -14,7 +14,11 @@ BUILD_META=-build$(shell TZ=UTC date +%Y%m%d)
 ORG ?= rancher
 PKG ?= github.com/kubernetes-sigs/cri-tools
 SRC ?= github.com/kubernetes-sigs/cri-tools
-TAG ?= v1.26.1$(BUILD_META)
+TAG ?= ${GITHUB_ACTION_TAG}
+
+ifeq ($(TAG),)
+TAG := v1.26.1$(BUILD_META)
+endif
 
 ifeq (,$(filter %$(BUILD_META),$(TAG)))
 $(error TAG needs to end with build metadata: $(BUILD_META))
@@ -44,12 +48,13 @@ image-push:
 image-scan:
 	trivy --severity $(SEVERITIES) --no-progress --ignore-unfixed $(ORG)/hardened-crictl:$(TAG)
 
-PHONY: log
+.PHONY: log
 log:
 	@echo "ARCH=$(ARCH)"
-	@echo "TAG=$(TAG)"
+	@echo "TAG=$(TAG:$(BUILD_META)=)"
 	@echo "ORG=$(ORG)"
 	@echo "PKG=$(PKG)"
 	@echo "SRC=$(SRC)"
 	@echo "BUILD_META=$(BUILD_META)"
 	@echo "UNAME_M=$(UNAME_M)"
+	@echo "GOLANG_VERSION=$(GOLANG_VERSION)"
