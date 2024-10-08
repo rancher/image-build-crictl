@@ -18,6 +18,7 @@ RUN git clone --depth=1 https://${SRC}.git $GOPATH/src/${PKG}
 WORKDIR $GOPATH/src/${PKG}
 RUN git fetch --all --tags --prune
 RUN git checkout tags/${TAG} -b ${TAG}
+RUN go mod edit -replace github.com/docker/docker=github.com/docker/docker@v27.1.1+incompatible && go mod tidy && go mod vendor
 ENV GO_LDFLAGS="-linkmode=external -X ${PKG}/pkg/version.Version=${TAG}"
 RUN go-build-static.sh -gcflags=-trimpath=${GOPATH}/src -o bin/crictl ./cmd/crictl
 RUN go-assert-static.sh bin/*
