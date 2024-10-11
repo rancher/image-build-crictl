@@ -19,8 +19,8 @@ WORKDIR $GOPATH/src/${PKG}
 RUN git fetch --all --tags --prune
 RUN git checkout tags/${TAG} -b ${TAG}
 RUN go mod edit -replace github.com/docker/docker=github.com/docker/docker@v27.1.1+incompatible && go mod tidy && go mod vendor
-ENV GO_LDFLAGS="-linkmode=external -X ${PKG}/pkg/version.Version=${TAG}"
-RUN go-build-static.sh -gcflags=-trimpath=${GOPATH}/src -o bin/crictl ./cmd/crictl
+RUN GO_LDFLAGS="-linkmode=external -X $(awk '/^module /{print $2}' go.mod)/pkg/version.Version=${TAG}" \
+    go-build-static.sh -gcflags=-trimpath=${GOPATH}/src -o bin/crictl ./cmd/crictl
 RUN go-assert-static.sh bin/*
 RUN if [ "${ARCH}" = "amd64" ]; then \
         go-assert-boring.sh bin/* ; \
