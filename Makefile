@@ -17,7 +17,7 @@ SRC ?= github.com/kubernetes-sigs/cri-tools
 TAG ?= ${GITHUB_ACTION_TAG}
 
 ifeq ($(TAG),)
-TAG := v1.26.1$(BUILD_META)
+TAG := v1.32.0$(BUILD_META)
 endif
 
 ifeq (,$(filter %$(BUILD_META),$(TAG)))
@@ -29,12 +29,14 @@ GOLANG_VERSION := $(shell ./scripts/golang-version.sh $(TAG))
 .PHONY: image-build
 image-build:
 	docker buildx build \
+		--progress=plain \
 		--platform=$(ARCH) \
 		--pull \
 		--build-arg PKG=$(PKG) \
 		--build-arg SRC=$(SRC) \
 		--build-arg TAG=$(TAG:$(BUILD_META)=) \
- 		--build-arg ARCH=$(ARCH) \
+		--build-arg ARCH=$(ARCH) \
+		--build-arg GO_IMAGE=rancher/hardened-build-base:$(GOLANG_VERSION) \
 		--tag $(ORG)/hardened-crictl:$(TAG) \
 		--tag $(ORG)/hardened-crictl:$(TAG)-$(ARCH) \
 		--load \
