@@ -24,7 +24,7 @@ jobs:
         echo "$(make -s log | grep TAG)" >> "$GITHUB_ENV"
 
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+      uses: docker/setup-qemu-action@v4
 
     - name: "Read secrets"
       uses: rancher-eio/read-vault-secrets@main
