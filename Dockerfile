@@ -1,4 +1,4 @@
-ARG GO_IMAGE=rancher/hardened-build-base:v1.26.3b1
+ARG GO_IMAGE=rancher/hardened-build-base:v1.26.5b1
 FROM ${GO_IMAGE} AS builder
 # setup required packages
 RUN set -x && \
