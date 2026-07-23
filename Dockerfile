@@ -27,6 +27,8 @@ RUN set -x; \
     for MODULE in $(go mod edit --json | jq -r '.Replace[] | select(.Old.Path | test("^k8s.io/")) | select(.Old.Path | test("^k8s.io/(kubernetes|klog|utils|kube-openapi)") | not) | .Old.Path'); do go mod edit --replace ${MODULE}=${MODULE}@${K8S_VERSION_MOD}; done; \
     for MODULE in $(go mod edit --json | jq -r '.Require[] | select(.Path | test("^k8s.io/")) | select(.Path | test("^k8s.io/(kubernetes|klog|utils|kube-openapi)") | not) | .Path'); do go mod edit --require ${MODULE}@${K8S_VERSION_MOD}; done; \
     go mod tidy && go mod vendor
+COPY go-mod-overrides ./go-mod-overrides
+RUN go-mod-overrides.sh ./go-mod-overrides
 RUN GO_LDFLAGS="-linkmode=external -X $(awk '/^module /{print $2}' go.mod)/pkg/version.Version=${TAG}" \
     go-build-static.sh -gcflags=-trimpath=${GOPATH}/src -o bin/crictl ./cmd/crictl
 RUN go-assert-static.sh bin/*
