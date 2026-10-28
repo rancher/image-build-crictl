@@ -29,7 +29,7 @@ RUN set -x; \
     for MODULE in $(go mod edit --json | jq -r '.Require[] | select(.Path | test("^k8s.io/")) | select(.Path | test("^k8s.io/(kubernetes|klog|utils|kube-openapi)") | not) | .Path'); do go mod edit --require ${MODULE}@${K8S_VERSION_MOD}; done; \
     go mod tidy && go mod vendor
 COPY go-mod-overrides ./go-mod-overrides
-RUN go-mod-overrides.sh ./go-mod-overrides
+RUN go-mod-replacer -local ./go-mod-overrides
 RUN go mod download
 
 ARG TARGETARCH
